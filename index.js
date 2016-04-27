@@ -7,6 +7,7 @@ var HANDLEBARS = 'handlebars';
 var JADE = 'jade';
 var MUSTACHE = 'mustache';
 var NUNJUCKS = 'nunjucks';
+var HTML = 'html';
 
 var LIB_LOADED = {};
 LIB_LOADED[HANDLEBARS] = !!window.Handlebars;
@@ -85,6 +86,10 @@ function renderTemplate (template, type, context) {
     case NUNJUCKS: {
       return template.render(context);
     }
+    default: {
+      // If type not specified, assume raw HTML and no templating needed.
+      return template;
+    }
   }
 }
 
@@ -99,6 +104,9 @@ function fetchTemplateFromScriptTag (src, type) {
 
   // Try to infer template type from <script type> if type not specified.
   if (!type) {
+    if (!scriptType) {
+      throw new Error('Must provide `type` attribute for <script> templates (e.g., handlebars, jade, nunjucks, html)');
+    }
     if (scriptType.indexOf('handlebars') !== -1) {
       type = HANDLEBARS;
     } else if (scriptType.indexOf('jade') !== -1) {
@@ -107,6 +115,8 @@ function fetchTemplateFromScriptTag (src, type) {
       type = MUSTACHE;
     } else if (scriptType.indexOf('nunjucks') !== -1) {
       type = NUNJUCKS
+    } else if(scriptType.indexOf('html') !== -1) {
+      type = HTML;
     } else {
       error('Template type could not be inferred from the script tag. Please add a type.');
       return;
@@ -154,7 +164,7 @@ function getCompiler (type) {
     }
     default: {
       // If type not specified, assume raw HTML and no templating needed.
-      return function (str) { return str; }
+      return function (str) { return str; };
     }
   }
 }
@@ -178,6 +188,9 @@ function compileNunjucksTemplate (templateStr) {
 
 function injectTemplateLib (type) {
   return new Promise(function (resolve) {
+    // No lib injection required.
+    if (!type || type === 'html') { return resolve(); }
+
     var scriptEl = LIB_LOADED[type];
 
     // Engine loaded.

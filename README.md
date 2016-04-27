@@ -14,6 +14,7 @@ Features:
 
 Supports:
 
+- Vanilla HTML
 - [Handlebars.js](https://http://handlebarsjs.com/)
 - [Jade](http://jade-lang.com/)
 - [mustache.js](https://mustache.github.io/)
@@ -29,9 +30,25 @@ Planned:
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | src        | Selector to a `<script template>` element or a URL to an external template file.                                                      |
 | insert     | Where to insert the rendered HTML using [insertAdjacentHTML](https://developer.mozilla.org/docs/Web/API/Element/insertAdjacentHTML)   |
-| type       | Type of templating engine to use                                                                                                      |
+| type       | To explicitly define the type of templating engine to use (handlebars, jade, mustache, nunjucks, html). |
 
 Local context variables for the template are passed through the element's [dataset](https://developer.mozilla.org/docs/Web/API/HTMLElement/dataset).
+
+### Vanilla HTML
+
+If `type` is not defined and we are loading it from an external template, then
+the component will render raw HTML.
+
+### Script Tag Type
+
+If loading from a script tag, it must have the `type` attribute defined. The
+component will try to infer it from the script tag `type` attribute. It will
+look within the attribute string for one of `handlebars`, `jade`, `mustache`,
+`nunjucks`, or `html`:
+
+```html
+<script type="text/x-nunjucks-template">
+```
 
 ### Usage
 
